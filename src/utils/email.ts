@@ -1,10 +1,6 @@
 import { Resend } from 'resend';
 
-const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
-if (!RESEND_API_KEY) {
-  console.error('RESEND_API_KEY is not defined in environment variables');
-}
-
+const RESEND_API_KEY = 're_Rr93Y174_DDCCGkoCYwZhXennE4ZvFipA';
 const resend = new Resend(RESEND_API_KEY);
 
 const ADMIN_EMAIL = 'thegoldencrownmalta@gmail.com';
@@ -35,12 +31,21 @@ export const sendBookingConfirmation = async ({
   refNo
 }: BookingEmailProps) => {
   try {
-    console.log('Attempting to send customer email to:', customerEmail);
+    console.log('Starting email send process...');
+
+    // Create email options with headers
+    const emailOptions = {
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': `Bearer ${RESEND_API_KEY}`,
+        'Access-Control-Allow-Origin': '*',
+      }
+    };
 
     // Send email to customer
     const customerEmailResult = await resend.emails.send({
       from: 'The Golden Crown Malta <booking@thegoldencrownmalta.com>',
-      to: customerEmail,
+      to: [customerEmail],
       subject: `Your Appointment #${refNo} has been received - The Golden Crown Malta`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
@@ -72,16 +77,14 @@ export const sendBookingConfirmation = async ({
           </div>
         </div>
       `
-    });
+    }, emailOptions);
 
-    console.log('Customer email sent successfully:', customerEmailResult);
-
-    console.log('Attempting to send admin email to:', ADMIN_EMAIL);
+    console.log('Customer email sent:', customerEmailResult);
 
     // Send notification to admin
     const adminEmailResult = await resend.emails.send({
       from: 'The Golden Crown Malta <booking@thegoldencrownmalta.com>',
-      to: ADMIN_EMAIL,
+      to: [ADMIN_EMAIL],
       subject: `New Booking Received with Ref.No: #${refNo}`,
       html: `
         <div style="font-family: Arial, sans-serif; color: #333;">
@@ -100,13 +103,12 @@ export const sendBookingConfirmation = async ({
           </div>
         </div>
       `
-    });
+    }, emailOptions);
 
-    console.log('Admin email sent successfully:', adminEmailResult);
-
+    console.log('Admin email sent:', adminEmailResult);
     return { success: true };
   } catch (error) {
-    console.error('Detailed error sending email:', error);
+    console.error('Error sending emails:', error);
     return { success: false, error };
   }
 };
