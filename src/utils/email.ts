@@ -1,6 +1,11 @@
 import { Resend } from 'resend';
 
-const resend = new Resend('re_Rr93Y174_DDCCGkoCYwZhXennE4ZvFipA');
+const RESEND_API_KEY = import.meta.env.VITE_RESEND_API_KEY;
+if (!RESEND_API_KEY) {
+  console.error('RESEND_API_KEY is not defined in environment variables');
+}
+
+const resend = new Resend(RESEND_API_KEY);
 
 const ADMIN_EMAIL = 'thegoldencrownmalta@gmail.com';
 
@@ -30,8 +35,10 @@ export const sendBookingConfirmation = async ({
   refNo
 }: BookingEmailProps) => {
   try {
+    console.log('Attempting to send customer email to:', customerEmail);
+
     // Send email to customer
-    await resend.emails.send({
+    const customerEmailResult = await resend.emails.send({
       from: 'The Golden Crown Malta <booking@thegoldencrownmalta.com>',
       to: customerEmail,
       subject: `Your Appointment #${refNo} has been received - The Golden Crown Malta`,
@@ -67,8 +74,12 @@ export const sendBookingConfirmation = async ({
       `
     });
 
+    console.log('Customer email sent successfully:', customerEmailResult);
+
+    console.log('Attempting to send admin email to:', ADMIN_EMAIL);
+
     // Send notification to admin
-    await resend.emails.send({
+    const adminEmailResult = await resend.emails.send({
       from: 'The Golden Crown Malta <booking@thegoldencrownmalta.com>',
       to: ADMIN_EMAIL,
       subject: `New Booking Received with Ref.No: #${refNo}`,
@@ -91,9 +102,11 @@ export const sendBookingConfirmation = async ({
       `
     });
 
+    console.log('Admin email sent successfully:', adminEmailResult);
+
     return { success: true };
   } catch (error) {
-    console.error('Error sending email:', error);
+    console.error('Detailed error sending email:', error);
     return { success: false, error };
   }
 };
