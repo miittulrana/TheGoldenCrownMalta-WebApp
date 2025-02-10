@@ -5,6 +5,7 @@ import { format } from 'date-fns';
 import { Scissors, Clock, EuroIcon, AlertCircle } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 import { isValidEmail, isValidPhone, sanitizeInput } from '@/utils/validation';
+import { sendBookingConfirmation } from '@/utils/email';
 import type { Service, TimeSlot, CustomerForm } from '@/types';
 import 'react-day-picker/dist/style.css';
 
@@ -243,22 +244,33 @@ export default function Booking() {
     try {
       setBookingLoading(true);
 
-      // Format time for database
-      const timeMatch = selectedTime.match(/(\d+):(\d+)\s*(AM|PM)/i);
-      if (!timeMatch) {
-        throw new Error('Invalid time format');
-      }
-
-      let [_, hours, minutes, period] = timeMatch;
-      let hour = parseInt(hours);
-
-      if (period.toUpperCase() === 'PM' && hour !== 12) {
-        hour += 12;
-      } else if (period.toUpperCase() === 'AM' && hour === 12) {
-        hour = 0;
-      }
-
-      const formattedTime = `${hour.toString().padStart(2, '0')}:${minutes}:00`;
+      // Time format conversion
+      const formatTime = (timeStr: string) => {
+        try {
+          const timeMatch = timeStr.match(/(\d+):(\d+)\s*(AM|PM)/i);
+          if (!timeMatch) {
+            throw new Error('Invalid time format');
+          }
+   
+          let [_, hours, minutes, period] = timeMatch;
+          let hour = parseInt(hours);
+   
+          if (period.toUpperCase() === 'PM' && hour !== 12) {
+            hour += 12;
+          } else if (period.toUpperCase() === 'AM' && hour === 12) {
+            hour = 0;
+          }
+   
+          return `${hour.toString().padStart(2, '0')}:${minutes}:00`;
+        } catch (error) {
+          console.error('Time formatting error:', error, 'Input time:', timeStr);
+          throw new Error('Failed to format time');
+        }
+      };
+   
+      const formattedTime = formatTime(selectedTime);
+      console.log('Selected time:', selectedTime);
+      console.log('Formatted time:', formattedTime);
 
       // Sanitize form data
       const sanitizedForm = {
@@ -293,6 +305,27 @@ export default function Booking() {
         }]);
 
       if (bookingError) throw bookingError;
+
+      // Send confirmation emails
+      const emailResult = await sendBookingConfirmation({
+        customerName: sanitizedForm.name,
+        customerEmail: sanitizedForm.email,
+        customerPhone: sanitizedForm.phone,
+        customerCity: sanitizedForm.city,
+        serviceName: service.name,
+        date: format(selectedDate, 'EEEE, MMMM d, yyyy'),
+        time: selectedTime,
+        price: service.price,
+        duration: service.duration_minutes,
+        refNo: refNo
+      });
+
+      if (!emailResult.success) {
+        console.error('Email sending failed but booking was created', emailResult.error);
+        // Still proceed with navigation since booking was successful
+      } else {
+        console.log('Booking confirmation emails sent successfully');
+      }
 
       // Navigate to confirmation
       navigate('/booking/confirmation', {
@@ -373,8 +406,8 @@ export default function Booking() {
         />
       </div>
 
-      {/* Time Selection */}
-      {selectedDate && (
+{/* Time Selection */}
+{selectedDate && (
         <div className="bg-surface rounded-lg p-6 mb-6">
           <h3 className="text-xl font-semibold text-text mb-4">Select Time</h3>
           {availableSlots.length > 0 ? (
@@ -406,8 +439,8 @@ export default function Booking() {
         </div>
       )}
 
-{/* Customer Details Form */}
-<div className="bg-surface rounded-lg p-6 mb-6">
+      {/* Customer Details Form */}
+      <div className="bg-surface rounded-lg p-6 mb-6">
         <h3 className="text-xl font-semibold text-text mb-4">Your Details</h3>
         <div className="space-y-4">
           {/* Name Field */}

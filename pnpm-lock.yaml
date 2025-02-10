@@ -39,7 +39,7 @@ importers:
         specifier: ^2.10.1
         version: 2.15.1(react-dom@18.3.1(react@18.3.1))(react@18.3.1)
       resend:
-        specifier: ^2.0.0
+        specifier: ^2.1.0
         version: 2.1.0
     devDependencies:
       '@tailwindcss/aspect-ratio':
