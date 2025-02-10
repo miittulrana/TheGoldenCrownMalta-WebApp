@@ -321,8 +321,8 @@ export default function Booking() {
       });
 
       if (!emailResult.success) {
-        console.error('Email sending failed but booking was created', emailResult.error);
-        // Still proceed with navigation since booking was successful
+        console.error('Email sending failed:', emailResult.error);
+        // Continue with navigation even if email fails
       } else {
         console.log('Booking confirmation emails sent successfully');
       }
