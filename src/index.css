@@ -1,0 +1,50 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+ 
+@layer base {
+  :root {
+    --background: 0 0% 7%;
+    --surface: 0 0% 12%;
+    --primary: 39 100% 50%;
+    --accent: 51 100% 50%;
+    --text: 0 0% 100%;
+    --subtext: 0 0% 67%;
+    --error: 348 50% 64%;
+    --warning: 36 100% 65%;
+    --success: 123 28% 64%;
+  }
+
+  body {
+    @apply bg-background text-text;
+    font-feature-settings: "rlig" 1, "calt" 1;
+  }
+}
+
+@keyframes marquee {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-100%); }
+}
+
+@keyframes marquee2 {
+  0% { transform: translateX(100%); }
+  100% { transform: translateX(0); }
+}
+
+.animate-marquee {
+  animation: marquee 25s linear infinite;
+}
+
+.animate-marquee2 {
+  animation: marquee2 25s linear infinite;
+}
+
+.marquee-container {
+  mask-image: linear-gradient(
+    to right,
+    transparent,
+    black 10%,
+    black 90%,
+    transparent
+  );
+}
