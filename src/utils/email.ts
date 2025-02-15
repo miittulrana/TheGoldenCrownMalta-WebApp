@@ -14,15 +14,28 @@ interface BookingEmailProps {
 interface EmailResponse {
   success: boolean;
   error?: string;
-  data?: any;
+  customerEmail?: {
+    id: string;
+    from: string;
+    to: string[];
+    status: string;
+  };
 }
 
 export const sendBookingConfirmation = async (props: BookingEmailProps): Promise<EmailResponse> => {
   try {
-    console.log('Starting email sending process for booking:', props.refNo);
+    console.log('Starting email sending process:', {
+      refNo: props.refNo,
+      customer: props.customerEmail
+    });
 
     // Input validation
     if (!props.customerEmail || !props.customerName || !props.refNo) {
+      console.error('Missing required fields:', {
+        hasEmail: Boolean(props.customerEmail),
+        hasName: Boolean(props.customerName),
+        hasRefNo: Boolean(props.refNo)
+      });
       throw new Error('Missing required fields for email');
     }
 
@@ -48,25 +61,27 @@ export const sendBookingConfirmation = async (props: BookingEmailProps): Promise
     const data = await response.json();
 
     if (!response.ok) {
+      console.error('Email API error response:', data);
       throw new Error(data.error || 'Failed to send email');
     }
 
-    console.log('Email sent successfully for booking:', props.refNo);
+    console.log('Email sent successfully:', {
+      refNo: props.refNo,
+      response: data
+    });
 
     return {
       success: true,
-      data
+      customerEmail: data.customerEmail
     };
 
   } catch (error) {
-    // Log detailed error for debugging
-    console.error('Error sending booking confirmation email:', {
+    console.error('Email sending failed:', {
       error: error instanceof Error ? error.message : 'Unknown error',
-      bookingRef: props.refNo,
+      refNo: props.refNo,
       customer: props.customerEmail
     });
 
-    // Return user-friendly error
     return {
       success: false,
       error: error instanceof Error 
@@ -76,14 +91,15 @@ export const sendBookingConfirmation = async (props: BookingEmailProps): Promise
   }
 };
 
-// Helper function to get user-friendly error messages
 export const getEmailErrorMessage = (error: string): string => {
   switch (error.toLowerCase()) {
     case 'missing required fields for email':
       return 'Unable to send email: Missing required information';
     case 'failed to send email':
       return 'Unable to send confirmation email. Please check your inbox later.';
+    case 'network error':
+      return 'Network error: Please check your internet connection';
     default:
-      return 'Unable to send confirmation email. Our team has been notified.';
+      return 'Booking confirmed but confirmation email may be delayed. Please check your inbox later.';
   }
 };
