@@ -18,7 +18,21 @@ export default defineConfig({
     }
   },
   define: {
-    // Explicitly make environment variables available
     __RESEND_API_KEY__: `"${process.env.VITE_RESEND_API_KEY}"`,
+  },
+  optimizeDeps: {
+    include: ['@supabase/supabase-js', 'react-day-picker']
+  },
+  build: {
+    rollupOptions: {
+      output: {
+        manualChunks: {
+          vendor: ['react', 'react-dom', 'react-router-dom'],
+          ui: ['@headlessui/react', '@heroicons/react', 'lucide-react'],
+          charts: ['recharts'],
+          date: ['date-fns', 'react-day-picker']
+        }
+      }
+    }
   }
 })
