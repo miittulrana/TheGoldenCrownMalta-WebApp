@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle2, Calendar, Clock, ArrowLeft, Scissors, Euro, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
+import { CheckCircle2, Calendar, Clock, ArrowLeft, Scissors, Mail, AlertCircle } from 'lucide-react';
 
 interface LocationState {
   refNo: string;

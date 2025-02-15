@@ -149,27 +149,27 @@ export default function Booking() {
         .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
         .neq('status', 'cancelled');
 
-      // Mark booked slots as unavailable
-      if (bookings) {
-        bookings.forEach(booking => {
-          const bookingStart = new Date(`2000-01-01 ${booking.booking_time}`);
-          const bookingEnd = new Date(bookingStart.getTime() + 
-            (booking.services.duration_minutes * 60000));
+// Mark booked slots as unavailable
+if (bookings) {
+  bookings.forEach(booking => {
+    const bookingStart = new Date(`2000-01-01 ${booking.booking_time}`);
+    const bookingEnd = new Date(bookingStart.getTime() + 
+      (booking.services[0].duration_minutes * 60000)); // Access first item of array
 
-          slots.forEach((slot, index) => {
-            const slotTime = new Date(`2000-01-01 ${slot.time}`);
-            const slotEnd = new Date(slotTime.getTime() + (interval * 60000));
+    slots.forEach((slot, index) => {
+      const slotTime = new Date(`2000-01-01 ${slot.time}`);
+      const slotEnd = new Date(slotTime.getTime() + (interval * 60000));
 
-            if (
-              (slotTime >= bookingStart && slotTime < bookingEnd) ||
-              (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
-              (slotTime <= bookingStart && slotEnd >= bookingEnd)
-            ) {
-              slots[index].available = false;
-            }
-          });
-        });
+      if (
+        (slotTime >= bookingStart && slotTime < bookingEnd) ||
+        (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+        (slotTime <= bookingStart && slotEnd >= bookingEnd)
+      ) {
+        slots[index].available = false;
       }
+    });
+  });
+}
 
       setAvailableSlots(slots);
     } catch (error) {
