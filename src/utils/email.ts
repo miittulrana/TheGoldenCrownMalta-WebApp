@@ -1,8 +1,3 @@
-import { Resend } from 'resend';
-
-const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
-const ADMIN_EMAIL = 'thegoldencrownmalta@gmail.com';
-
 interface BookingEmailProps {
   customerName: string;
   customerEmail: string;
@@ -16,73 +11,79 @@ interface BookingEmailProps {
   refNo: string;
 }
 
-export const sendBookingConfirmation = async (props: BookingEmailProps) => {
+interface EmailResponse {
+  success: boolean;
+  error?: string;
+  data?: any;
+}
+
+export const sendBookingConfirmation = async (props: BookingEmailProps): Promise<EmailResponse> => {
   try {
-    // Send customer email
-    const customerEmail = await resend.emails.send({
-      from: 'The Golden Crown Malta <onboarding@resend.dev>',
-      to: props.customerEmail,
-      subject: `Your Appointment #${props.refNo} is Confirmed - The Golden Crown Malta`,
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-          <h2>Booking Confirmation</h2>
-          <p>Dear ${props.customerName},</p>
-          <p>Your appointment has been confirmed at The Golden Crown Malta.</p>
-          
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <h3>Booking Details:</h3>
-            <p><strong>Reference Number:</strong> #${props.refNo}</p>
-            <p><strong>Service:</strong> ${props.serviceName}</p>
-            <p><strong>Date:</strong> ${props.date}</p>
-            <p><strong>Time:</strong> ${props.time}</p>
-            <p><strong>Duration:</strong> ${props.duration} minutes</p>
-            <p><strong>Price:</strong> €${props.price.toFixed(2)}</p>
-            <p><strong>Name:</strong> ${props.customerName}</p>
-            <p><strong>Phone:</strong> ${props.customerPhone}</p>
-            <p><strong>Email:</strong> ${props.customerEmail}</p>
-            <p><strong>City:</strong> ${props.customerCity}</p>
-          </div>
-          
-          <p>If you need to make any changes to your booking, please contact us.</p>
-          <p>We look forward to seeing you!</p>
-          
-          <div style="margin-top: 30px; font-size: 14px; color: #666;">
-            <p>The Golden Crown Malta</p>
-            <p>Contact: +356 7777 0765</p>
-            <p>Save this email for your reference.</p>
-          </div>
-        </div>
-      `
+    console.log('Starting email sending process for booking:', props.refNo);
+
+    // Input validation
+    if (!props.customerEmail || !props.customerName || !props.refNo) {
+      throw new Error('Missing required fields for email');
+    }
+
+    const response = await fetch('/api/send-email', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+      },
+      body: JSON.stringify({
+        customerName: props.customerName,
+        customerEmail: props.customerEmail,
+        customerPhone: props.customerPhone,
+        customerCity: props.customerCity,
+        serviceName: props.serviceName,
+        date: props.date,
+        time: props.time,
+        price: props.price,
+        duration: props.duration,
+        refNo: props.refNo
+      })
     });
 
-    // Send admin notification
-    const adminEmail = await resend.emails.send({
-      from: 'The Golden Crown Malta <onboarding@resend.dev>',
-      to: ADMIN_EMAIL,
-      subject: `New Booking Received #${props.refNo}`,
-      html: `
-        <div style="font-family: Arial, sans-serif; color: #333;">
-          <h2>New Booking Details</h2>
-          
-          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
-            <p><strong>Reference Number:</strong> #${props.refNo}</p>
-            <p><strong>Service:</strong> ${props.serviceName}</p>
-            <p><strong>Date:</strong> ${props.date}</p>
-            <p><strong>Time:</strong> ${props.time}</p>
-            <p><strong>Name:</strong> ${props.customerName}</p>
-            <p><strong>Phone:</strong> ${props.customerPhone}</p>
-            <p><strong>Email:</strong> ${props.customerEmail}</p>
-            <p><strong>City:</strong> ${props.customerCity}</p>
-            <p><strong>Duration:</strong> ${props.duration} minutes</p>
-            <p><strong>Price:</strong> €${props.price.toFixed(2)}</p>
-          </div>
-        </div>
-      `
-    });
+    const data = await response.json();
 
-    return { success: true };
+    if (!response.ok) {
+      throw new Error(data.error || 'Failed to send email');
+    }
+
+    console.log('Email sent successfully for booking:', props.refNo);
+
+    return {
+      success: true,
+      data
+    };
+
   } catch (error) {
-    console.error('Error sending emails:', error);
-    return { success: false, error };
+    // Log detailed error for debugging
+    console.error('Error sending booking confirmation email:', {
+      error: error instanceof Error ? error.message : 'Unknown error',
+      bookingRef: props.refNo,
+      customer: props.customerEmail
+    });
+
+    // Return user-friendly error
+    return {
+      success: false,
+      error: error instanceof Error 
+        ? error.message 
+        : 'Failed to send confirmation email'
+    };
+  }
+};
+
+// Helper function to get user-friendly error messages
+export const getEmailErrorMessage = (error: string): string => {
+  switch (error.toLowerCase()) {
+    case 'missing required fields for email':
+      return 'Unable to send email: Missing required information';
+    case 'failed to send email':
+      return 'Unable to send confirmation email. Please check your inbox later.';
+    default:
+      return 'Unable to send confirmation email. Our team has been notified.';
   }
 };
