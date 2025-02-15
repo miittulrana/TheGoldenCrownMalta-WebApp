@@ -1,9 +1,9 @@
 {
   "framework": "vite",
-  "buildCommand": "vite build",
-  "devCommand": "vite dev",
+  "buildCommand": "pnpm run build",
+  "devCommand": "pnpm run dev",
+  "installCommand": "!pnpm install",
   "outputDirectory": "dist",
-  "installCommand": "npm install",
   "routes": [
     {
       "src": "/api/(.*)",
