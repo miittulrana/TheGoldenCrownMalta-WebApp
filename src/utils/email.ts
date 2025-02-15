@@ -1,3 +1,8 @@
+import { Resend } from 'resend';
+
+const resend = new Resend(import.meta.env.VITE_RESEND_API_KEY);
+const ADMIN_EMAIL = 'thegoldencrownmalta@gmail.com';
+
 interface BookingEmailProps {
   customerName: string;
   customerEmail: string;
@@ -11,93 +16,73 @@ interface BookingEmailProps {
   refNo: string;
 }
 
-interface EmailResponse {
-  success: boolean;
-  error?: string;
-  data?: any;
-}
-
-export const sendBookingConfirmation = async (props: BookingEmailProps): Promise<EmailResponse> => {
+export const sendBookingConfirmation = async (props: BookingEmailProps) => {
   try {
-    // Validate required fields
-    if (!props.customerEmail || !props.customerName || !props.refNo) {
-      throw new Error('Missing required fields for email');
-    }
-
-    console.log('Starting email sending process...', {
-      recipient: props.customerEmail,
-      refNo: props.refNo
+    // Send customer email
+    const customerEmail = await resend.emails.send({
+      from: 'The Golden Crown Malta <onboarding@resend.dev>',
+      to: props.customerEmail,
+      subject: `Your Appointment #${props.refNo} is Confirmed - The Golden Crown Malta`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2>Booking Confirmation</h2>
+          <p>Dear ${props.customerName},</p>
+          <p>Your appointment has been confirmed at The Golden Crown Malta.</p>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <h3>Booking Details:</h3>
+            <p><strong>Reference Number:</strong> #${props.refNo}</p>
+            <p><strong>Service:</strong> ${props.serviceName}</p>
+            <p><strong>Date:</strong> ${props.date}</p>
+            <p><strong>Time:</strong> ${props.time}</p>
+            <p><strong>Duration:</strong> ${props.duration} minutes</p>
+            <p><strong>Price:</strong> €${props.price.toFixed(2)}</p>
+            <p><strong>Name:</strong> ${props.customerName}</p>
+            <p><strong>Phone:</strong> ${props.customerPhone}</p>
+            <p><strong>Email:</strong> ${props.customerEmail}</p>
+            <p><strong>City:</strong> ${props.customerCity}</p>
+          </div>
+          
+          <p>If you need to make any changes to your booking, please contact us.</p>
+          <p>We look forward to seeing you!</p>
+          
+          <div style="margin-top: 30px; font-size: 14px; color: #666;">
+            <p>The Golden Crown Malta</p>
+            <p>Contact: +356 7777 0765</p>
+            <p>Save this email for your reference.</p>
+          </div>
+        </div>
+      `
     });
 
-    // Make API call to our serverless function
-    const response = await fetch('/api/send-email', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify({
-        customerName: props.customerName,
-        customerEmail: props.customerEmail,
-        customerPhone: props.customerPhone,
-        customerCity: props.customerCity,
-        serviceName: props.serviceName,
-        date: props.date,
-        time: props.time,
-        price: props.price,
-        duration: props.duration,
-        refNo: props.refNo
-      }),
+    // Send admin notification
+    const adminEmail = await resend.emails.send({
+      from: 'The Golden Crown Malta <onboarding@resend.dev>',
+      to: ADMIN_EMAIL,
+      subject: `New Booking Received #${props.refNo}`,
+      html: `
+        <div style="font-family: Arial, sans-serif; color: #333;">
+          <h2>New Booking Details</h2>
+          
+          <div style="background-color: #f5f5f5; padding: 15px; border-radius: 5px; margin: 20px 0;">
+            <p><strong>Reference Number:</strong> #${props.refNo}</p>
+            <p><strong>Service:</strong> ${props.serviceName}</p>
+            <p><strong>Date:</strong> ${props.date}</p>
+            <p><strong>Time:</strong> ${props.time}</p>
+            <p><strong>Name:</strong> ${props.customerName}</p>
+            <p><strong>Phone:</strong> ${props.customerPhone}</p>
+            <p><strong>Email:</strong> ${props.customerEmail}</p>
+            <p><strong>City:</strong> ${props.customerCity}</p>
+            <p><strong>Duration:</strong> ${props.duration} minutes</p>
+            <p><strong>Price:</strong> €${props.price.toFixed(2)}</p>
+          </div>
+        </div>
+      `
     });
 
-    // Parse response
-    const responseData = await response.json();
-
-    // Check if the response was successful
-    if (!response.ok) {
-      console.error('Email API response error:', responseData);
-      throw new Error(responseData.error || 'Failed to send email');
-    }
-
-    console.log('Email sent successfully', {
-      recipient: props.customerEmail,
-      refNo: props.refNo,
-      response: responseData
-    });
-
-    return {
-      success: true,
-      data: responseData
-    };
-
+    return { success: true };
   } catch (error) {
-    // Log the full error for debugging
-    console.error('Error in sendBookingConfirmation:', {
-      error,
-      props,
-      errorMessage: error instanceof Error ? error.message : 'Unknown error occurred'
-    });
-
-    // Return a structured error response
-    return {
-      success: false,
-      error: error instanceof Error 
-        ? error.message 
-        : 'An unexpected error occurred while sending the confirmation email'
-    };
-  }
-};
-
-// Helper function to handle email errors in the UI
-export const getEmailErrorMessage = (error: string): string => {
-  // Map common errors to user-friendly messages
-  switch (error.toLowerCase()) {
-    case 'missing required fields for email':
-      return 'Unable to send email: Missing required information';
-    case 'failed to send email':
-      return 'Unable to send confirmation email at this time';
-    case 'network error':
-      return 'Network error: Please check your internet connection';
-    default:
-      return 'Unable to send confirmation email. Please check your inbox later.';
+    console.error('Error sending emails:', error);
+    return { success: false, error };
   }
 };
