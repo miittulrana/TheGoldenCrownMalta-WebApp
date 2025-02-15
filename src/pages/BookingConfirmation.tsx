@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useLocation, useNavigate } from 'react-router-dom';
-import { CheckCircle2, Calendar, Clock, ArrowLeft, Scissors, Euro, Phone, Mail, MapPin } from 'lucide-react';
+import { CheckCircle2, Calendar, Clock, ArrowLeft, Scissors, Euro, Phone, Mail, MapPin, AlertCircle } from 'lucide-react';
 
 interface LocationState {
   refNo: string;
@@ -8,6 +8,7 @@ interface LocationState {
   service: string;
   date: string;
   time: string;
+  emailStatus?: string;  // Added emailStatus to the interface
 }
 
 export default function BookingConfirmation() {
@@ -89,6 +90,18 @@ export default function BookingConfirmation() {
             </div>
           </div>
         </div>
+
+        {/* Email Status Message */}
+        {state.emailStatus && (
+          <div className="bg-warning/10 rounded-lg p-4 mb-6">
+            <div className="flex gap-3">
+              <AlertCircle className="w-5 h-5 text-warning flex-shrink-0 mt-1" />
+              <p className="text-sm text-warning">
+                {state.emailStatus}
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* Information Notes */}
         <div className="bg-primary/10 rounded-lg p-4 mb-6">

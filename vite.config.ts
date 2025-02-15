@@ -12,13 +12,13 @@ export default defineConfig({
   server: {
     port: 3000,
     open: true,
-    cors: true, // Enable CORS
+    cors: true,
     headers: {
       'Access-Control-Allow-Origin': '*',
     }
   },
   define: {
-    'process.env': {},
-    'import.meta.env.VITE_RESEND_API_KEY': JSON.stringify(process.env.VITE_RESEND_API_KEY),
+    // Explicitly make environment variables available
+    __RESEND_API_KEY__: `"${process.env.VITE_RESEND_API_KEY}"`,
   }
 })

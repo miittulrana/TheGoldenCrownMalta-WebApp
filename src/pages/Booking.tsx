@@ -48,6 +48,7 @@ export default function Booking() {
   const [loading, setLoading] = useState(true);
   const [bookingLoading, setBookingLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [emailStatus, setEmailStatus] = useState<string | null>(null);
 
   const [form, setForm] = useState<CustomerForm>({
     name: '',
@@ -243,6 +244,8 @@ export default function Booking() {
 
     try {
       setBookingLoading(true);
+      setError(null);
+      setEmailStatus(null);
 
       // Time format conversion
       const formatTime = (timeStr: string) => {
@@ -307,6 +310,7 @@ export default function Booking() {
       if (bookingError) throw bookingError;
 
       // Send confirmation emails
+      console.log('Sending confirmation emails...');
       const emailResult = await sendBookingConfirmation({
         customerName: sanitizedForm.name,
         customerEmail: sanitizedForm.email,
@@ -322,9 +326,10 @@ export default function Booking() {
 
       if (!emailResult.success) {
         console.error('Email sending failed:', emailResult.error);
-        // Continue with navigation even if email fails
+        setEmailStatus('Booking confirmed but confirmation email may be delayed');
       } else {
         console.log('Booking confirmation emails sent successfully');
+        setEmailStatus('Booking confirmed and confirmation email sent');
       }
 
       // Navigate to confirmation
@@ -334,7 +339,8 @@ export default function Booking() {
           name: sanitizedForm.name,
           service: service.name,
           date: format(selectedDate, 'EEEE, MMMM d, yyyy'),
-          time: selectedTime
+          time: selectedTime,
+          emailStatus: emailStatus
         }
       });
 
@@ -389,8 +395,8 @@ export default function Booking() {
         </div>
       </div>
 
-      {/* Date Selection */}
-      <div className="bg-surface rounded-lg p-6 mb-6">
+{/* Date Selection */}
+<div className="bg-surface rounded-lg p-6 mb-6">
         <h3 className="text-xl font-semibold text-text mb-4">Select Date</h3>
         <DayPicker
           mode="single"
@@ -406,8 +412,8 @@ export default function Booking() {
         />
       </div>
 
-{/* Time Selection */}
-{selectedDate && (
+      {/* Time Selection */}
+      {selectedDate && (
         <div className="bg-surface rounded-lg p-6 mb-6">
           <h3 className="text-xl font-semibold text-text mb-4">Select Time</h3>
           {availableSlots.length > 0 ? (
@@ -560,6 +566,14 @@ export default function Booking() {
         </div>
       )}
 
+      {/* Email Status Message */}
+      {emailStatus && (
+        <div className="bg-warning/10 rounded-lg p-4 mb-6 flex items-center gap-2">
+          <AlertCircle className="w-5 h-5 text-warning flex-shrink-0" />
+          <p className="text-warning">{emailStatus}</p>
+        </div>
+      )}
+
       {/* Submit Button */}
       <button
         onClick={handleBooking}
@@ -571,7 +585,7 @@ export default function Booking() {
             : 'bg-primary hover:bg-primary/90'
           }
           text-black transition-colors
-        `}
+`}
       >
         {bookingLoading ? (
           <span className="flex items-center justify-center gap-2">

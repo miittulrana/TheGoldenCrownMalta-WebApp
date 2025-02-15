@@ -1,14 +1,18 @@
 {
-    "framework": "vite",
-    "buildCommand": "vite build",
-    "devCommand": "vite dev",
-    "outputDirectory": "dist",
-    "installCommand": "npm install",
-    "routes": [
-      {
-        "src": "/[^.]+",
-        "dest": "/",
-        "status": 200
-      }
-    ]
-  }
+  "framework": "vite",
+  "buildCommand": "vite build",
+  "devCommand": "vite dev",
+  "outputDirectory": "dist",
+  "installCommand": "npm install",
+  "routes": [
+    {
+      "src": "/api/(.*)",
+      "dest": "/api/$1"
+    },
+    {
+      "src": "/[^.]+",
+      "dest": "/",
+      "status": 200
+    }
+  ]
+}
