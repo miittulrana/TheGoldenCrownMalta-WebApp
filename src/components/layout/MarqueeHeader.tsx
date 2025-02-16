@@ -4,25 +4,25 @@ export default function MarqueeHeader() {
         <div className="marquee-container relative flex overflow-x-hidden">
           <div className="animate-marquee whitespace-nowrap py-4"> {/* Increased padding */}
             <span className="inline-block text-lg sm:text-lg md:text-xl font-extrabold mx-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wider uppercase">
-              DOWNLOAD OUR APP & SAVE - EXCLUSIVE MOBILE REWARDS AWAITS!
+              Sharp Cuts, One Tap Away - Our App is Coming Soon!
             </span>
             <span className="inline-block text-lg sm:text-lg md:text-xl font-extrabold mx-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wider uppercase">
-              DOWNLOAD OUR APP & SAVE - EXCLUSIVE MOBILE REWARDS AWAITS!
+              Sharp Cuts, One Tap Away - Our App is Coming Soon!
             </span>
             <span className="inline-block text-lg sm:text-lg md:text-xl font-extrabold mx-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wider uppercase">
-              DOWNLOAD OUR APP & SAVE - EXCLUSIVE MOBILE REWARDS AWAITS!
+              Sharp Cuts, One Tap Away - Our App is Coming Soon!
             </span>
           </div>
   
           <div className="absolute top-0 animate-marquee2 whitespace-nowrap py-4"> {/* Increased padding */}
             <span className="inline-block text-lg sm:text-lg md:text-xl font-extrabold mx-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wider uppercase">
-              DOWNLOAD OUR APP & SAVE - EXCLUSIVE MOBILE REWARDS AWAITS!
+              Sharp Cuts, One Tap Away - Our App is Coming Soon!
             </span>
             <span className="inline-block text-lg sm:text-lg md:text-xl font-extrabold mx-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wider uppercase">
-              DOWNLOAD OUR APP & SAVE - EXCLUSIVE MOBILE REWARDS AWAITS!
+              Sharp Cuts, One Tap Away - Our App is Coming Soon!
             </span>
             <span className="inline-block text-lg sm:text-lg md:text-xl font-extrabold mx-6 bg-gradient-to-r from-primary via-accent to-primary bg-clip-text text-transparent tracking-wider uppercase">
-              DOWNLOAD OUR APP & SAVE - EXCLUSIVE MOBILE REWARDS AWAITS!
+              Sharp Cuts, One Tap Away - Our App is Coming Soon!
             </span>
           </div>
         </div>

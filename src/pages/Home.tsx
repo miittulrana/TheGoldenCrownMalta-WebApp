@@ -31,9 +31,9 @@ function AppPromoModal({ isOpen, onClose, onProceed }: AppPromoModalProps) {
             Download Our App Below!
           </p>
 
-          {/* App Store Buttons */}
+          {/* App Store Button */}
           <div className="flex justify-center gap-4 py-4">
-            <a
+            
               href="#"
               className="transition-transform hover:-translate-y-1 duration-300"
               target="_blank"
@@ -45,18 +45,6 @@ function AppPromoModal({ isOpen, onClose, onProceed }: AppPromoModalProps) {
                 className="h-10 w-auto"
               />
             </a>
-            <a
-              href="#"
-              className="transition-transform hover:-translate-y-1 duration-300"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src="/play-store.png"
-                alt="Play Store"
-                className="h-10 w-auto"
-              />
-            </a>
           </div>
 
           {/* Proceed Button */}
@@ -65,7 +53,7 @@ function AppPromoModal({ isOpen, onClose, onProceed }: AppPromoModalProps) {
             className="w-full py-3 text-black font-semibold bg-primary hover:bg-primary/90 
                      rounded-lg transition-colors duration-300"
           >
-            I Want to Proceed Without App
+            Sharp Cuts, One Tap Away – Our App is Coming Soon!
           </button>
         </div>
       </div>
@@ -132,10 +120,10 @@ export default function Home() {
           {/* Download Section */}
           <div className="space-y-4">
             <h2 className="text-primary text-xl">
-              Download Our App
+              App Coming Soon!
             </h2>
             <div className="flex justify-center gap-6">
-              <a
+              
                 href="#"
                 className="transition-transform duration-300 hover:-translate-y-1"
                 target="_blank"
@@ -144,18 +132,6 @@ export default function Home() {
                 <img
                   src="/app-store.png"
                   alt="App Store"
-                  className="h-10 w-auto"
-                />
-              </a>
-              <a
-                href="#"
-                className="transition-transform duration-300 hover:-translate-y-1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src="/play-store.png"
-                  alt="Play Store"
                   className="h-10 w-auto"
                 />
               </a>
