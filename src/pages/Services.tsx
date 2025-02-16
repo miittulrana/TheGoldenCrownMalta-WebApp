@@ -36,15 +36,15 @@ export default function Services() {
     try {
       setLoading(true);
       setError(null);
-
+  
       const { data, error } = await supabase
         .from('services')
         .select('*')
         .eq('is_active', true)
-        .order('name');
-
+        .order('display_order', { ascending: true }); // Changed from .order('name')
+  
       if (error) throw error;
-
+  
       setServices(data || []);
     } catch (error) {
       console.error('Error loading services:', error);
