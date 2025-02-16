@@ -9,6 +9,14 @@ import { sendBookingConfirmation, getEmailErrorMessage } from '@/utils/email';
 import type { Service, TimeSlot, CustomerForm } from '@/types';
 import 'react-day-picker/dist/style.css';
 
+// Interface for booking with service
+interface BookingWithService {
+  booking_time: string;
+  services: {
+    duration_minutes: number;
+  };
+}
+
 function BookingSkeleton() {
   return (
     <div className="container mx-auto px-4 py-8 animate-pulse">
@@ -142,16 +150,16 @@ export default function Booking() {
         currentTime = new Date(currentTime.getTime() + interval * 60000);
       }
 
-      // Load existing bookings
+      // Load existing bookings with proper typing
       const { data: bookings } = await supabase
         .from('bookings')
-        .select('booking_time, services ( duration_minutes )')
+        .select('booking_time, services:service_id ( duration_minutes )')
         .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
-        .neq('status', 'cancelled');
+        .neq('status', 'cancelled') as { data: BookingWithService[] | null };
 
       // Mark booked slots as unavailable
       if (bookings) {
-        bookings.forEach(booking => {
+        bookings.forEach((booking: BookingWithService) => {
           const bookingStart = new Date(`2000-01-01 ${booking.booking_time}`);
           const bookingEnd = new Date(bookingStart.getTime() + 
             (booking.services.duration_minutes * 60000));
