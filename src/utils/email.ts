@@ -35,3 +35,16 @@ interface BookingEmailProps {
       };
     }
   };
+  
+  export const getEmailErrorMessage = (error: string): string => {
+    switch (error.toLowerCase()) {
+      case 'missing required fields for email':
+        return 'Unable to send email: Missing required information';
+      case 'failed to send email':
+        return 'Unable to send confirmation email. Please check your inbox later.';
+      case 'network error':
+        return 'Network error: Please check your internet connection';
+      default:
+        return 'Booking confirmed but confirmation email may be delayed';
+    }
+  };
