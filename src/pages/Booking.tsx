@@ -5,7 +5,7 @@ import { format } from 'date-fns';
 import { Scissors, Clock, EuroIcon, AlertCircle } from 'lucide-react';
 import { supabase } from '@/utils/supabase';
 import { isValidEmail, isValidPhone, sanitizeInput } from '@/utils/validation';
-import { sendBookingConfirmation } from '@/utils/email';
+import { sendBookingConfirmation, getEmailErrorMessage } from '@/utils/email';
 import type { Service, TimeSlot, CustomerForm } from '@/types';
 import 'react-day-picker/dist/style.css';
 
@@ -149,27 +149,27 @@ export default function Booking() {
         .eq('booking_date', format(selectedDate, 'yyyy-MM-dd'))
         .neq('status', 'cancelled');
 
-// Mark booked slots as unavailable
-if (bookings) {
-  bookings.forEach(booking => {
-    const bookingStart = new Date(`2000-01-01 ${booking.booking_time}`);
-    const bookingEnd = new Date(bookingStart.getTime() + 
-      (booking.services[0].duration_minutes * 60000)); // Access first item of array
+      // Mark booked slots as unavailable
+      if (bookings) {
+        bookings.forEach(booking => {
+          const bookingStart = new Date(`2000-01-01 ${booking.booking_time}`);
+          const bookingEnd = new Date(bookingStart.getTime() + 
+            (booking.services.duration_minutes * 60000));
 
-    slots.forEach((slot, index) => {
-      const slotTime = new Date(`2000-01-01 ${slot.time}`);
-      const slotEnd = new Date(slotTime.getTime() + (interval * 60000));
+          slots.forEach((slot, index) => {
+            const slotTime = new Date(`2000-01-01 ${slot.time}`);
+            const slotEnd = new Date(slotTime.getTime() + (interval * 60000));
 
-      if (
-        (slotTime >= bookingStart && slotTime < bookingEnd) ||
-        (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
-        (slotTime <= bookingStart && slotEnd >= bookingEnd)
-      ) {
-        slots[index].available = false;
+            if (
+              (slotTime >= bookingStart && slotTime < bookingEnd) ||
+              (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+              (slotTime <= bookingStart && slotEnd >= bookingEnd)
+            ) {
+              slots[index].available = false;
+            }
+          });
+        });
       }
-    });
-  });
-}
 
       setAvailableSlots(slots);
     } catch (error) {
@@ -325,8 +325,9 @@ if (bookings) {
       });
 
       if (!emailResult.success) {
-        console.error('Email sending failed:', emailResult.error);
-        setEmailStatus('Booking confirmed but confirmation email may be delayed');
+        const errorMessage = getEmailErrorMessage(emailResult.error || '');
+        console.error('Email sending failed:', errorMessage);
+        setEmailStatus('Booking confirmed but email notification may be delayed');
       } else {
         console.log('Booking confirmation emails sent successfully');
         setEmailStatus('Booking confirmed and confirmation email sent');
@@ -340,7 +341,7 @@ if (bookings) {
           service: service.name,
           date: format(selectedDate, 'EEEE, MMMM d, yyyy'),
           time: selectedTime,
-          emailStatus: emailStatus
+          emailStatus: emailStatus || 'Booking confirmed successfully'
         }
       });
 
@@ -585,7 +586,7 @@ if (bookings) {
             : 'bg-primary hover:bg-primary/90'
           }
           text-black transition-colors
-`}
+        `}
       >
         {bookingLoading ? (
           <span className="flex items-center justify-center gap-2">
