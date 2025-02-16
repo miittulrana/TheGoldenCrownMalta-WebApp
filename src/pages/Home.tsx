@@ -1,6 +1,3 @@
-import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-
 interface AppPromoModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -28,23 +25,16 @@ function AppPromoModal({ isOpen, onClose, onProceed }: AppPromoModalProps) {
 
           {/* Message */}
           <p className="text-lg text-white">
-            Download Our App Below!
+            App Coming Soon!
           </p>
 
           {/* App Store Button */}
           <div className="flex justify-center gap-4 py-4">
-            
-              href="#"
-              className="transition-transform hover:-translate-y-1 duration-300"
-              target="_blank"
-              rel="noopener noreferrer"
-            >
-              <img
-                src="/app-store.png"
-                alt="App Store"
-                className="h-10 w-auto"
-              />
-            </a>
+            <img
+              src="/app-store.png"
+              alt="App Store"
+              className="h-10 w-auto"
+            />
           </div>
 
           {/* Proceed Button */}
@@ -53,7 +43,7 @@ function AppPromoModal({ isOpen, onClose, onProceed }: AppPromoModalProps) {
             className="w-full py-3 text-black font-semibold bg-primary hover:bg-primary/90 
                      rounded-lg transition-colors duration-300"
           >
-            Sharp Cuts, One Tap Away – Our App is Coming Soon!
+            I Want to Proceed Without App
           </button>
         </div>
       </div>
@@ -123,18 +113,11 @@ export default function Home() {
               App Coming Soon!
             </h2>
             <div className="flex justify-center gap-6">
-              
-                href="#"
-                className="transition-transform duration-300 hover:-translate-y-1"
-                target="_blank"
-                rel="noopener noreferrer"
-              >
-                <img
-                  src="/app-store.png"
-                  alt="App Store"
-                  className="h-10 w-auto"
-                />
-              </a>
+              <img
+                src="/app-store.png"
+                alt="App Store"
+                className="h-10 w-auto transition-transform duration-300 hover:-translate-y-1"
+              />
             </div>
           </div>
         </div>

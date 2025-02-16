@@ -1,4 +1,5 @@
 import { Routes, Route } from 'react-router-dom';
+import { useEffect } from 'react';
 import Layout from './components/layout/Layout';
 import Home from './pages/Home';
 import Services from './pages/Services';
@@ -6,9 +7,15 @@ import Booking from './pages/Booking';
 import BookingConfirmation from './pages/BookingConfirmation';
 import Privacy from './pages/Privacy';
 import Terms from './pages/Terms';
-import './index.css'; // Make sure CSS is imported
+import { updateSEO } from './utils/seo';
+import './index.css';
 
 function App() {
+  useEffect(() => {
+    // Initialize global SEO
+    updateSEO();
+  }, []);
+
   return (
     <>
       <div className="min-h-screen flex flex-col bg-background">
